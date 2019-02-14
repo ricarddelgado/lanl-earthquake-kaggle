@@ -12,6 +12,6 @@ Repository for the SlimBros team for the DLANL Earthquake Prediction challenge f
 ```
 $ conda create -n lanl python=3.7
 $ conda activate lanl
-$(lanl) pip install -r requirements.txt
+$ (lanl) pip install -r requirements.txt
 ```
 
