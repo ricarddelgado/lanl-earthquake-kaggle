@@ -8,9 +8,10 @@ Repository for the SlimBros team for the DLANL Earthquake Prediction challenge f
  ```
  $ git clone git@github.com:ricarddelgado/lanl-earthquake-kaggle.git
  ```
- 2 - Create [virtual enviroment](http://docs.python-guide.org/en/latest/dev/virtualenvs/) (see `virtualenvwrapper`) and install python requirements
+ 2 - Create and activate your favourite virtual environment and install python requirements
 ```
-$ mkvirtualenv lanl
+$ conda create -n lanl python=3.7
+$ conda activate lanl
 $(lanl) pip install -r requirements.txt
 ```
 
