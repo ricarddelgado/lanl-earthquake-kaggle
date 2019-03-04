@@ -14,7 +14,7 @@ tf.set_random_seed(1234)
 # Variables
 TRAIN_PATH = "/home/guillem/Downloads/LANL-Earthquake-Prediction/train.csv"
 TARIN_VAL_SPLIT = 0.75
-filewriter_path = "/home/guillem/LANLTrains"
+filewriter_path = "/home/guillem/LANLTrains/tensorboard"
 checkpoint_path = "/home/guillem/LANLTrains"
 
 # Local variables

@@ -36,9 +36,30 @@ class model(object):
 
 
     def create_lstmmodel(self,x, eval):
+        print(x.get_shape())
+        print(tf.shape(x))
+        print("------")
+
+
+        inputs_unstack = tf.unstack(x, axis=1)
+        print(len(inputs_unstack))
+        print(tf.shape(inputs_unstack))
+        print("------")
+        fc7_out = []
+        for i in inputs_unstack:
+            flattened = tf.reshape(i,[-1, 2])
+            fc7_out.append(flattened)
+
+        aux = np.array(fc7_out)
+        print(len(fc7_out))
+        print(fc7_out[1].get_shape())
+        print(aux.shape)
+        print("------")
+
+
 
         lstm_layer = rnn.BasicLSTMCell(self.lstm_units, forget_bias=1)
-        lstm_outputs, _ = rnn.static_rnn(lstm_layer, x, dtype="float32")
+        lstm_outputs, _ = rnn.static_rnn(lstm_layer, fc7_out, dtype="float32")
 
         wd1 = tf.get_variable("wd1", [self.lstm_units, 1], initializer=tf.contrib.layers.xavier_initializer(),
                               trainable=eval)

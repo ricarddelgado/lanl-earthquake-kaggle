@@ -3,8 +3,10 @@ import math
 
 class Dataset_Manager():
     def __init__(self, dataset_split, TRAIN_VAL_SPLIT, sequence_length, batch_size):
-        train_samples = round(dataset_split*TRAIN_VAL_SPLIT)
-        validation_samples = dataset_split-train_samples
+        train_samples = int(round(dataset_split*TRAIN_VAL_SPLIT))
+        validation_samples = int(dataset_split-train_samples)
+        print("The dataset contains {} train samples and {} validation samples which is a {} ratio".format(
+            train_samples, validation_samples, TRAIN_VAL_SPLIT))
 
         index = np.arange(dataset_split)
         np.random.shuffle(index)
@@ -12,7 +14,6 @@ class Dataset_Manager():
         self.validation_split = index[validation_samples:]
         self.train_split = index[:train_samples]
         self.seq_length = sequence_length
-        print(":)")
 
         self.total_batches_train = math.ceil(len(self.train_split)/batch_size)
         self.total_batches_validation = math.ceil(len(self.validation_split)/batch_size)
