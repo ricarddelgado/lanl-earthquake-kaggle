@@ -2,3 +2,5 @@ from utils.parabolic import parabolic
 from utils.parabolic import parabolic_polyfit
 from utils.frequency_estimation import freq_from_crossings
 from utils.frequency_estimation import freq_from_fft
+from utils.sampling import generate_segment_start_ids
+from utils.fancy_plots import compare_methods
