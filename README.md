@@ -8,7 +8,7 @@ Repository for the SlimBros team for the [LANL Earthquake Prediction challenge](
   * [File structure](#file-structure) 
   * [Models](#models)
   * [Current status](#current-status) 
-  * [Useful links](#useful-links) 
+  * [Useful links](#useful-links)
 
 ## Team
 - [Ricard Delgado-Gonzalo](https://www.linkedin.com/in/ricarddelgadogonzalo/)
@@ -23,14 +23,14 @@ Repository for the SlimBros team for the [LANL Earthquake Prediction challenge](
 All deadlines are at 11:59 PM UTC on the corresponding day unless otherwise noted. The competition organizers reserve the right to update the contest timeline if they deem it necessary.
 
 ## File structure
-```bash
+```
 .
-|-- 1.\ Basic\ Feature\ Benchmark\ (v0).ipynb <- Initial tests
-|-- 2.\ Seismic\ data\ EDA\ and\ baseline\ (v1).ipynb
-|-- 3.\ Earthquakes\ FE\ -\ More\ features\ and\ samples\ (v1).ipynb
-|-- 3.\ Earthquakes\ FE\ -\ More\ features\ and\ samples\ (v2).ipynb
-|-- 3.\ Earthquakes\ FE\ -\ More\ features\ and\ samples\ (v3).ipynb
-|-- 4.\ Test\ on\ new\ models.ipynb
+|-- 1. Basic Feature Benchmark (v0).ipynb <- Initial tests
+|-- 2. Seismic data EDA and baseline (v1).ipynb
+|-- 3. Earthquakes FE - More features and samples (v1).ipynb
+|-- 3. Earthquakes FE - More features and samples (v2).ipynb
+|-- 3. Earthquakes FE - More features and samples (v3).ipynb
+|-- 4. Test on new models.ipynb
 |-- exploratory_data_analysis
 |   |-- EDA.py
 |   `-- utils.py
@@ -42,8 +42,8 @@ All deadlines are at 11:59 PM UTC on the corresponding day unless otherwise note
 |   |-- 5x256x1.png
 |   |-- all_featuresx256x1.png
 |   `-- model.png
-|-- LANL\ Master\ notebook.ipynb
-|-- LANL\ Sampling\ schemes.ipynb
+|-- LANL Master notebook.ipynb
+|-- LANL Sampling schemes.ipynb
 |-- README.md
 `-- utils
     |-- fancy_plots.py
@@ -53,30 +53,35 @@ All deadlines are at 11:59 PM UTC on the corresponding day unless otherwise note
 ```
 
 ## Models
-- [x] LGBM
-- [x] XGBoost
-- [x] SVM
-- [x] Catboost
-- [x] Kernel ridge
-- [x] Modified genetic program model inspired in [this](https://www.kaggle.com/scirpus/andrews-script-plus-a-genetic-program-model)
-- [x] Random forest
-- [x] Extremely randomized trees
-- [x] Ada boost with a KernelRidge as base regressor
+- [x] Classical ML
+  - [x] LGBM
+  - [x] XGBoost
+  - [x] SVM
+  - [x] Catboost
+  - [x] Kernel ridge
+  - [x] Modified genetic program model inspired in [this](https://www.kaggle.com/scirpus/andrews-script-plus-a-genetic-program-model)
+  - [x] Random forest
+  - [x] Extremely randomized trees
+  - [x] Ada boost with a KernelRidge as base regressor
 - [ ] Neural networks
   - [x] Fully-connected with (all_features)x256x1
   - [ ] Ensemble of fully connected with 5x256x1
   - [x] DNN
   - [ ] RNN
+- [x] Blending the classical ML models
+- [x] Stacking the classical ML models
 
 ## Ongoing tasks
 - [ ] Data augmentation
   - [ ] Add Gaussian noise
   - [ ] Generate shifts
-- [ ] Regenerate ensemble RNN model
+- [ ] Regenerate ensemble FC-NN model with tanh and all features
+- [ ] Regenerate ensemble FC-NN model with relu and all features
 - [ ] Evaluate robustness of each model
 
 ## Current status
-
+Comparison of the different models.
+![All models compared](./figures/all_models_compared.png)
 
 ## Useful links
 - [Challenge website](https://www.kaggle.com/c/LANL-Earthquake-Prediction/)
