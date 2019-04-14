@@ -152,14 +152,10 @@ class PrintDot(tf.keras.callbacks.Callback):
         else:
             print('.', end='')
 
-            
-param_list_gdi = pd.read_csv('parameters_list_gdi.txt')
-param_list_gdi = param_list_gdi['param'].values.tolist()
-
-X_train_nn = X_train_scaled[param_list_gdi] #using the 128 features from the GDI kernel
+X_train_nn = X_train_scaled
 
 num_random_draws = 600
-tiny_nn_results_file = "../output/features_list_gdi_nn_5x256x1/small_nn_search_{}.csv".format(str(datetime.datetime.now()))
+tiny_nn_results_file = "../output/search_all_features_nn_5x1x1_tanh_linear/small_nn_search_{}.csv".format(str(datetime.datetime.now()))
 
 headers = ['f1','f2','f3','f4','f5','val_score']
 
@@ -175,14 +171,14 @@ for i in tqdm(range(num_random_draws)):
 
     activation_function = 'tanh' #tf.nn.tanh
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Dense(256,
+    model.add(tf.keras.layers.Dense(1,
                                     input_dim=X_train_nn_sampled.shape[-1],
                                     activation=activation_function))
     model.add(tf.keras.layers.Dense(1, activation='linear'))
 
     optimizer = tf.keras.optimizers.Adam(lr = 0.001, decay = 0.001 / 32)
     model.compile(loss='mean_absolute_error', optimizer=optimizer, metrics=['mean_absolute_error'])
-    EPOCHS = 250
+    EPOCHS = 200
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='mean_absolute_error', patience=100)
     history = model.fit(
         X_train_nn_sampled,
@@ -205,4 +201,3 @@ for i in tqdm(range(num_random_draws)):
         writer.writerow(line)
 
     writeFile.close()
-
