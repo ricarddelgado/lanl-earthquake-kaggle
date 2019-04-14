@@ -3,12 +3,12 @@
 Repository for the SlimBros team for the [LANL Earthquake Prediction challenge](https://www.kaggle.com/c/LANL-Earthquake-Prediction/) from Kaggle (May2019 to June2019). In this competition, the goal is to predict when the earthquake will take place. Specifically, to predict the time remaining before laboratory earthquakes occur from real-time seismic data.
 
 ## Table of contents
-  * [Team](##team)
-  * [Timeline](##timeline)
-  * [File structure](##file-structure) 
-  * [Models](##models)
-  * [Current status](##current-status) 
-  * [Useful links](##useful-links)
+  * [Team](#team)
+  * [Timeline](#timeline)
+  * [File structure](#file-structure) 
+  * [Models](#models)
+  * [Current status](#current-status) 
+  * [Useful links](#useful-links) 
 
 ## Team
 - [Ricard Delgado-Gonzalo](https://www.linkedin.com/in/ricarddelgadogonzalo/)
