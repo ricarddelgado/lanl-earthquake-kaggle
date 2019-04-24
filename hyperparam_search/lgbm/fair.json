@@ -1,0 +1,1 @@
+{"num_leaves": 8, "min_data_in_leaf": 60, "max_depth": 3, "learning_rate": 0.01, "bagging_freq": 5, "bagging_fraction": 0.6388888888888888, "reg_alpha": 0.19444444444444445, "reg_lambda": 0.95, "objective": "fair", "boosting": "gbdt", "verbosity": -1, "random_seed": 19, "n_estimators": 50000, "metric": "mae", "bagging_seed": 11}

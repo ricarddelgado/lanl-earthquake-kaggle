@@ -154,7 +154,7 @@ class PrintDot(tf.keras.callbacks.Callback):
 
 X_train_nn = X_train_scaled
 
-num_random_draws = 600
+num_random_draws = 2000
 tiny_nn_results_file = "../output/search_all_features_nn_5x1x1_tanh_linear/small_nn_search_{}.csv".format(str(datetime.datetime.now()))
 
 headers = ['f1','f2','f3','f4','f5','val_score']
@@ -176,8 +176,7 @@ for i in tqdm(range(num_random_draws)):
                                     activation=activation_function))
     model.add(tf.keras.layers.Dense(1, activation='linear'))
 
-    optimizer = tf.keras.optimizers.Adam(lr = 0.001, decay = 0.001 / 32)
-    model.compile(loss='mean_absolute_error', optimizer=optimizer, metrics=['mean_absolute_error'])
+    model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['mean_absolute_error'])
     EPOCHS = 200
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='mean_absolute_error', patience=100)
     history = model.fit(
