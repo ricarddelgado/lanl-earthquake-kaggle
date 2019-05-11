@@ -24,7 +24,7 @@ def freq_from_crossings(sig, fs):
     # zero-crossings (Measures 1000.000129 Hz for 1000 Hz, for instance)
     crossings = [i - sig[i] / (sig[i+1] - sig[i]) for i in idx]
     
-    if crossings.size == 0:
+    if not crossings:
         median_freq = 0
     else:
         median_freq = fs / np.median(diff(crossings[0]))
