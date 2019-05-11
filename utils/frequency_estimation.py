@@ -24,26 +24,10 @@ def freq_from_crossings(sig, fs):
     # zero-crossings (Measures 1000.000129 Hz for 1000 Hz, for instance)
     crossings = [i - sig[i] / (sig[i+1] - sig[i]) for i in idx]
     
-    diff_crossings = np.diff(crossings[0])
-    min_diff_crossings = np.min(diff_crossings)
-    max_diff_crossings = np.max(diff_crossings)
-    mean_diff_crossings = np.mean(diff_crossings)
-    median_diff_crossings = np.median(diff_crossings) 
-
-    mean_freq = fs / mean_diff_crossings
-    median_freq = fs / median_diff_crossings
-
-    mean_freq = fs / mean(diff(crossings[0]))
-    median_freq = fs / np.median(diff(crossings[0]))
-    
-    #plt.figure(figsize=(16, 8))
-    #plt.hist(diff_crossings, bins=500)
-    #plt.title(f'Histogram of diff crossings mean={mean_diff_crossings:0.1f} - {round(mean_freq)}Hz, median={median_diff_crossings:0.1f} - {round(median_freq)}')
-    #plt.ylabel('Count')
-    #plt.xlim(0,200)
-    #plt.axvline(x=mean_diff_crossings, color='g')
-    #plt.axvline(x=median_diff_crossings, color='r')
-    #plt.show()
+    if crossings.size == 0:
+        median_freq = 0
+    else:
+        median_freq = fs / np.median(diff(crossings[0]))
     
     return median_freq
 
@@ -60,14 +44,6 @@ def freq_from_fft(sig, fs):
     # Find the peak
     i = argmax(pw_spectrum[16:])+15
     peak_freq = fs * i / len(windowed)
-
-    #plt.figure(figsize=(16, 8))
-    #plt.plot(pw_spectrum)
-    #plt.axvline(x=i, color='r')
-    #plt.title(f'Power spectrum peak={peak_freq}Hz')
-    #plt.ylabel('Power')
-    #plt.xlabel('Sample')
-    #plt.show()   
 
     return peak_freq
 
@@ -89,10 +65,3 @@ def freq_from_welch(sig, fs):
     i = argmax(pw_spectrum[16:])+15
     peak_freq = fs * i / len(windowed)
 
-    #plt.figure(figsize=(16, 8))
-    #plt.plot(pw_spectrum)
-    #plt.axvline(x=i, color='r')
-    #plt.title(f'Power spectrum peak={peak_freq}Hz')
-    #plt.ylabel('Power')
-    #plt.xlabel('Sample')
-    #plt.show() 
