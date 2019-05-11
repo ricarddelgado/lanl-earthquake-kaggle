@@ -452,6 +452,11 @@ def compute_standard_features_block(xc, seg_id, X, fs, prefix=''):
         X.loc[seg_id, prefix + f'percentile_{p}'] = np.percentile(xc, p)
         X.loc[seg_id, prefix + f'abs_percentile_{p}'] = np.percentile(np.abs(xc), p)
 
+    X.loc[seg_id, prefix + 'num_crossing_0'] = feature_calculators.number_crossing_m(xc, 0)
+
+    for p in [95,99]:
+        X.loc[seg_id, prefix + f'binned_entropy_{p}'] = feature_calculators.binned_entropy(xc, p)
+
     # Andrew stats
     X.loc[seg_id, prefix + 'mean_diff'] = np.mean(np.diff(xc))
     X.loc[seg_id, prefix + 'mean_abs_diff'] = np.mean(np.abs(np.diff(xc)))
@@ -485,6 +490,7 @@ def compute_standard_features_block(xc, seg_id, X, fs, prefix=''):
     X.loc[seg_id, prefix + 'range_p4000_pinf'] = feature_calculators.range_count(xc, 4000, np.inf)
     for i, j in zip(borders, borders[1:]):
         X.loc[seg_id, prefix + f'range_{i}_{j}'] = feature_calculators.range_count(xc, i, j)
+        X.loc[seg_id, prefix + 'ratio_unique_values'] = feature_calculators.ratio_value_number_to_time_series_length(xc)
 
     X.loc[seg_id, prefix + 'max_to_min'] = xc.max() / np.abs(xc.min())
     X.loc[seg_id, prefix + 'max_to_min_diff'] = xc.max() - np.abs(xc.min())
@@ -761,7 +767,6 @@ def create_all_features_extended(seg_id, seg, X, fs):
 
     compute_fft_features_block(xc, seg_id, X)
     compute_bp_features_block(xc, seg_id, X)
-
     compute_standard_features_block(xc, seg_id, X, fs)
 
     x = pd.Series(xc)
@@ -770,5 +775,4 @@ def create_all_features_extended(seg_id, seg, X, fs):
     imagFFT = pd.Series(np.imag(zc))
     compute_standard_features_block(realFFT, seg_id, X, fs, prefix='fftr_')
     compute_standard_features_block(imagFFT, seg_id, X, fs, prefix='ffti_')
-
 

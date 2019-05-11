@@ -1,5 +1,6 @@
 from features.gen_predictor import gpi
 from features.gen_predictor_ii import gpi_new, gpii_new, gpiii_new
+from features.gen_predictor_tiny import gpi_tiny, gpii_tiny
 from features.lanl_features import add_trend_feature
 from features.lanl_features import sta_lta_ratio
 from features.lanl_features import des_bw_filter_lp
