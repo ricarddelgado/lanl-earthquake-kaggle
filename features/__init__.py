@@ -8,6 +8,7 @@ from features.lanl_features import des_bw_filter_hp
 from features.lanl_features import des_bw_filter_bp
 from features.lanl_features import create_all_features
 from features.lanl_features import create_all_features_extended
+from features.lanl_features import create_all_features_extended_denoised
 from features.lanl_features import compute_standard_features_block
 from features.lanl_features import compute_fft_features_block
 from features.lanl_features import compute_bp_features_block

@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 import scipy.signal as sg
 from itertools import product
-
+import pywt 
+from scipy import signal
+from scipy.signal import butter, deconvolve
 from scipy import stats
 from scipy.signal import hilbert, hann, convolve
 from sklearn.linear_model import LinearRegression
@@ -15,6 +17,52 @@ CUTOFF = 18000
 MAX_FREQ_IDX = 20000
 FREQ_STEP = 2500
 borders = list(range(-4000, 4001, 1000))
+
+def maddest(d, axis=None):
+    """
+    Mean Absolute Deviation
+    """
+    
+    return np.mean(np.absolute(d - np.mean(d, axis)), axis)
+
+def high_pass_filter(x, low_cutoff, SAMPLE_RATE):
+    """
+    From @randxie https://github.com/randxie/Kaggle-VSB-Baseline/blob/master/src/utils/util_signal.py
+    Modified to work with scipy version 1.1.0 which does not have the fs parameter
+    """
+    
+    # nyquist frequency is half the sample rate https://en.wikipedia.org/wiki/Nyquist_frequency
+    nyquist = 0.5 * SAMPLE_RATE
+    norm_low_cutoff = low_cutoff / nyquist
+    
+    # Fault pattern usually exists in high frequency band. According to literature, the pattern is visible above 10^4 Hz.
+    sos = butter(10, Wn=[norm_low_cutoff], btype='highpass', output='sos')
+    filtered_sig = signal.sosfilt(sos, x)
+
+    return filtered_sig
+
+def denoise_signal(x, wavelet='db4', level=1):
+    """
+    1. Adapted from waveletSmooth function found here:
+    http://connor-johnson.com/2016/01/24/using-pywavelets-to-remove-high-frequency-noise/
+    2. Threshold equation and using hard mode in threshold as mentioned
+    in section '3.2 denoising based on optimized singular values' from paper by Tomas Vantuch:
+    http://dspace.vsb.cz/bitstream/handle/10084/133114/VAN431_FEI_P1807_1801V001_2018.pdf
+    """
+    
+    # Decompose to get the wavelet coefficients
+    coeff = pywt.wavedec(x, wavelet, mode="per")
+    
+    # Calculate sigma for threshold as defined in http://dspace.vsb.cz/bitstream/handle/10084/133114/VAN431_FEI_P1807_1801V001_2018.pdf
+    # As noted by @harshit92 MAD referred to in the paper is Mean Absolute Deviation not Median Absolute Deviation
+    sigma = (1/0.6745) * maddest(coeff[-level])
+
+    # Calculate the univeral threshold
+    uthresh = sigma * np.sqrt(2*np.log(len(x)))
+    coeff[1:] = (pywt.threshold(i, value=uthresh, mode='hard') for i in coeff[1:])
+    
+    # Reconstruct the signal using the thresholded coefficients
+    return pywt.waverec(coeff, wavelet, mode='per')
 
 def add_trend_feature(arr, abs_values=False):
     idx = np.array(range(len(arr)))
@@ -763,7 +811,7 @@ def compute_fft_features_block(xc, seg_id, X):
 
 def create_all_features_extended(seg_id, seg, X, fs):
 
-    xc = pd.Series(seg['acoustic_data'].values)
+    xc = pd.Series(seg['acoustic_data'].values.astype('float64'))
 
     compute_fft_features_block(xc, seg_id, X)
     compute_bp_features_block(xc, seg_id, X)
@@ -776,3 +824,20 @@ def create_all_features_extended(seg_id, seg, X, fs):
     compute_standard_features_block(realFFT, seg_id, X, fs, prefix='fftr_')
     compute_standard_features_block(imagFFT, seg_id, X, fs, prefix='ffti_')
 
+def create_all_features_extended_denoised(seg_id, seg, X, fs):
+
+    xc_noisy = pd.Series(seg['acoustic_data'].values)
+    xc = denoise_signal(high_pass_filter(xc_noisy, low_cutoff=10000, SAMPLE_RATE=fs), wavelet='haar', level=1)
+
+    xc = pd.Series(xc)
+    
+    compute_fft_features_block(xc, seg_id, X)
+    compute_bp_features_block(xc, seg_id, X)
+    compute_standard_features_block(xc, seg_id, X, fs)
+
+    x = pd.Series(xc)
+    zc = np.fft.fft(x)
+    realFFT = pd.Series(np.real(zc))
+    imagFFT = pd.Series(np.imag(zc))
+    compute_standard_features_block(realFFT, seg_id, X, fs, prefix='fftr_')
+    compute_standard_features_block(imagFFT, seg_id, X, fs, prefix='ffti_')
