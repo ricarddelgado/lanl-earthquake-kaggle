@@ -88,5 +88,6 @@ modules.xml
 # End of https://www.gitignore.io/api/pycharm+all
 
 *checkpoint.ipynb
-submission.csv
+submission*.csv
 catboost_info/
+notebook_env.db
