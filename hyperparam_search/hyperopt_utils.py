@@ -1,8 +1,14 @@
 #import required packages
+import gc
+import numpy as np
+import pandas as pd
+import numpy.random
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_absolute_error
 import lightgbm as lgb
 import xgboost as xgb
 import catboost as cb
-import gc
+
 from hyperopt import hp, tpe, Trials, STATUS_OK
 from hyperopt.fmin import fmin
 from hyperopt.pyll.stochastic import sample
@@ -34,7 +40,7 @@ OBJECTIVE_CB_CLASS = 'Logloss' #CatBoost classification metric
 #OPTIONAL OUTPUT
 BEST_SCORE = 0
 
-def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic=False, Class=False):
+def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic=False, Class=False, seed=13):
     #==========
     #LightGBM
     #==========
@@ -72,13 +78,23 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
             space_params['subsample'] = subsample
             
             if Class:
-                cv_results = lgb.cv(space_params, train, nfold = N_FOLDS, stratified=True,
-                                    early_stopping_rounds=100, metrics=EVAL_METRIC_LGBM_CLASS, seed=42)
+                cv_results = lgb.cv(space_params,
+                                    train,
+                                    nfold=N_FOLDS,
+                                    stratified=True,
+                                    early_stopping_rounds=100,
+                                    metrics=EVAL_METRIC_LGBM_CLASS,
+                                    seed=seed)
                 best_loss = 1 - cv_results['auc-mean'][-1]
                 
             else:
-                cv_results = lgb.cv(space_params, train, nfold = N_FOLDS, stratified=False,
-                                    early_stopping_rounds=100, metrics=EVAL_METRIC_LGBM_REG, seed=42)
+                cv_results = lgb.cv(space_params,
+                                    train,
+                                    nfold = N_FOLDS,
+                                    stratified=False,
+                                    early_stopping_rounds=100,
+                                    metrics=EVAL_METRIC_LGBM_REG,
+                                    seed=seed)
                 best_loss = cv_results['l1-mean'][-1] #'l2-mean' for rmse
             
             return{'loss':best_loss, 'status': STATUS_OK }
@@ -90,15 +106,16 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
                           'subsample': hp.uniform('subsample', 0.5, 1)},
                          {'boosting': 'goss',
                           'subsample': 1.0,
-                         'top_rate': hp.uniform('top_rate', 0, 0.5),
-                         'other_rate': hp.uniform('other_rate', 0, 0.5)}] #if including 'dart', make sure to set 'n_estimators'
+                          'top_rate': hp.uniform('top_rate', 0, 0.5),
+                          'other_rate': hp.uniform('other_rate', 0, 0.5)}] #if including 'dart', make sure to set 'n_estimators'
         
         if Class:
             metric_list = ['auc'] #modify as required for other classification metrics
             objective_list = ['binary', 'cross_entropy']
         
         else:
-            metric_list = ['MAE', 'RMSE'] 
+            #metric_list = ['MAE', 'RMSE'] 
+            metric_list = ['MAE'] 
             objective_list = ['huber', 'gamma', 'fair', 'tweedie']
         
         
@@ -185,7 +202,7 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
                 
             #for classification replace EVAL_METRIC_XGB_REG with EVAL_METRIC_XGB_CLASS
             cv_results = xgb.cv(space_params, train, nfold=N_FOLDS, metrics=[EVAL_METRIC_XGB_REG],
-                             early_stopping_rounds=100, stratified=False, seed=42)
+                             early_stopping_rounds=100, stratified=False, seed=seed)
             
             best_loss = cv_results['test-mae-mean'].iloc[-1] #or 'test-rmse-mean' if using RMSE
             #for classification, comment out the line above and uncomment the line below:
@@ -303,7 +320,7 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
                        
             #for classification set stratified=True
             cv_results = cb.cv(train, space_params, fold_count=N_FOLDS, 
-                             early_stopping_rounds=25, stratified=False, partition_random_seed=42)
+                             early_stopping_rounds=25, stratified=False, partition_random_seed=seed)
            
             best_loss = cv_results['test-MAE-mean'].iloc[-1] #'test-RMSE-mean' for RMSE
             #for classification, comment out the line above and uncomment the line below:
