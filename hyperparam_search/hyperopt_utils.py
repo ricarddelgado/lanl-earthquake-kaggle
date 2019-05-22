@@ -42,8 +42,6 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
             for param in integer_params:
                 space_params[param] = int(space_params[param])
             
-            space_params['boosting'] = space_params['boosting']['boosting']
-            
             cv_results = lgb.cv(space_params,
                                 train,
                                 nfold=N_FOLDS,
@@ -58,23 +56,19 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
         train = lgb.Dataset(data, labels)
                 
         #integer and string parameters, used with hp.choice()
-        boosting_list = [{'boosting': 'gbdt'}]
-        
-        metric_list = ['MAE'] 
         objective_list = ['huber', 'gamma', 'fair']
-        
         space ={
-                'boosting' : hp.choice('boosting', boosting_list),
-                'num_leaves' : hp.quniform('num_leaves', 2, LGBM_MAX_LEAVES, 1),
-                'max_depth': hp.quniform('max_depth', 2, LGBM_MAX_DEPTH, 1),
-                'min_data_in_leaf': hp.quniform('min_data_in_leaf', 1, 256, 1),
-                'reg_alpha' : hp.uniform('reg_alpha', 0, 5),
-                'reg_lambda' : hp.uniform('reg_lambda', 0, 5),
+                'boosting' : 'gbdt',
+                'num_leaves' : hp.quniform('num_leaves', 8, 92, 4),
+                'max_depth': hp.quniform('max_depth', -1, 16, 1),
+                'min_data_in_leaf': hp.quniform('min_data_in_leaf', 1, 100, 1),
+                'reg_alpha' : hp.uniform('reg_alpha', 0.1, 0.95),
+                'reg_lambda' : hp.uniform('reg_lambda', 0.1, 0.95),
                 'learning_rate' : hp.loguniform('learning_rate', np.log(0.005), np.log(0.2)),
-                'metric' : hp.choice('metric', metric_list),
+                'metric' : 'mae',
                 'objective' : hp.choice('objective', objective_list),
-                'bagging_fraction' : hp.quniform('bagging_fraction', 0.5, 1, 0.01),
-                'bagging_freq': hp.quniform('bagging_freq', 1, 100, 1)
+                'bagging_fraction' : hp.uniform('bagging_fraction', 0.5, 0.95),
+                'bagging_freq': hp.quniform('bagging_freq', 3, 7, 1)
             }
         
         #optional: activate GPU for LightGBM
@@ -94,8 +88,6 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
                 
         #fmin() will return the index of values chosen from the lists/arrays in 'space'
         #to obtain actual values, index values are used to subset the original lists/arrays
-        best['boosting'] = boosting_list[best['boosting']]['boosting']#nested dict, index twice
-        best['metric'] = metric_list[best['metric']]
         best['objective'] = objective_list[best['objective']]
                 
         #cast floats of integer params to int
