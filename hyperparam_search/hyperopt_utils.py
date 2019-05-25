@@ -19,23 +19,24 @@ N_FOLDS = 5 #number of cross-validation folds on data in each evaluation round
 #LIGHTGBM PARAMETERS
 LGBM_MAX_LEAVES = 2**10 #maximum number of leaves per tree for LightGBM
 LGBM_MAX_DEPTH = 25 #maximum tree depth for LightGBM
-EVAL_METRIC_LGBM_REG = 'mae' #LightGBM regression metric. Note that 'rmse' is more commonly used 
-EVAL_METRIC_LGBM_CLASS = 'auc'#LightGBM classification metric
 
-def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic=False, Class=False):
-    #==========
-    #LightGBM
-    #==========
+def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, eval_metric='mae', diagnostic=False):
+    
+    # LightGBM
     if package=='lgbm':
         print(f'Running {num_evals} rounds of LightGBM parameter optimisation:')
         #clear space
         gc.collect()
         
-        integer_params = ['max_depth',
-                          'num_leaves',
-                          'min_data_in_leaf',
-                          'bagging_freq']
-        
+        integer_params = ['max_depth', 'num_leaves', 'min_data_in_leaf', 'bagging_freq']
+        if eval_metric=='mae':
+            metric = 'mae'
+        elif eval_metric=='mse':
+            metric = 'mse'
+        else:
+            print(f'Metric {eval_metric} not found. Falling back to mae.')
+            metric = 'mae'
+            
         def objective(space_params):
             
             #cast integer params from float to int
@@ -47,10 +48,13 @@ def quick_hyperopt(data, labels, package='lgbm', num_evals=NUM_EVALS, diagnostic
                                 nfold=N_FOLDS,
                                 stratified=False,
                                 early_stopping_rounds=200,
-                                metrics=EVAL_METRIC_LGBM_REG,
+                                metrics=metric,
                                 seed=42)
-            best_loss = cv_results['l1-mean'][-1] #'l2-mean' for rmse
-            
+            if metric=='mae':
+                best_loss = cv_results['l1-mean'][-1]
+            elif metric=='mse':
+                best_loss = cv_results['l2-mean'][-1]
+
             return{'loss':best_loss, 'status': STATUS_OK }
         
         train = lgb.Dataset(data, labels)
