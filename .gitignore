@@ -99,3 +99,4 @@ earthquake-epoch*
 # Log files
 log_*.txt
 checkpoint
+MAE Loss.png
