@@ -610,7 +610,7 @@ seq_length = 150
 batch_size = 32
 n_features = 4 #72 #94
 starter_learning_rate = 0.001
-epochs = 300
+epochs = 400
 
 
 
