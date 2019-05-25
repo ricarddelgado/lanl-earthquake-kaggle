@@ -87,7 +87,15 @@ modules.xml
 
 # End of https://www.gitignore.io/api/pycharm+all
 
-*checkpoint.ipynb
+# Intermediate submissions
 submission*.csv
+
+*checkpoint.ipynb
 catboost_info/
+folder_to_save_graph_3/
 notebook_env.db
+earthquake-epoch*
+
+# Log files
+log_*.txt
+checkpoint
